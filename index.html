@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUBULU - Authentic Labubu Raffle Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --pastel-pink: #FFD6E0;
+            --pastel-purple: #E0D6FF;
+            --pastel-blue: #D6E5FF;
+            --pastel-green: #D6FFE5;
+            --pastel-yellow: #FFF9D6;
+            --pastel-orange: #FFE5D6;
+        }
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: white;
+        }
+        
+        .hero-background {
+            background: linear-gradient(135deg, rgba(255, 154, 162, 0.85), rgba(224, 214, 255, 0.85), rgba(214, 229, 255, 0.85)),
+                        url('https://tinyurl.com/3sae7xxz');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .rainbow-text {
+            background: linear-gradient(to right, #FF9AA2, #FFB7B2, #FFDAC1, #E2F0CB, #B5EAD7, #C7CEEA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+        
+        .pastel-card {
+            background: linear-gradient(135deg, rgba(255, 214, 224, 0.4), rgba(224, 214, 255, 0.4));
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+        
+        .countdown {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .raffle-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .raffle-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #FF9AA2, #FFB7B2);
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 154, 162, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 154, 162, 0.4);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, #FF9AA2, #FFB7B2);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .star {
+            display: inline-block;
+            color: #FFD700;
+            animation: twinkle 2s infinite alternate;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.7; transform: scale(1) rotate(0deg); }
+            100% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .form-input {
+            border-radius: 12px;
+            border: 2px solid #E0D6FF;
+            padding: 12px 15px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #FF9AA2;
+            box-shadow: 0 0 0 4px rgba(255, 154, 162, 0.2);
+        }
+        
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        .feature-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 20px rgba(255, 154, 162, 0.3);
+        }
+        
+        .feature-icon:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 12px 30px rgba(255, 154, 162, 0.4);
+        }
+        
+        .labubu-image {
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+            transition: all 0.4s ease;
+        }
+        
+        .labubu-image:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+        
+        .floating {
+            animation: floating 4s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 139, 0.5), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 10s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .daily-super-draw {
+            background: linear-gradient(135deg, rgba(255, 214, 224, 0.3), rgba(224, 214, 255, 0.3), rgba(214, 229, 255, 0.3));
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .daily-super-draw::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .prize-image-container {
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .prize-image {
+            transition: transform 0.6s ease;
+        }
+        
+        ./*prize-image-container:hover .prize-image {
+            transform: rotateY(10deg) scale(1.05);*/
+        }
+        
+        .countdown-display {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px 24px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .badge-glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4); }
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="rainbow-text text-3xl font-bold">BUBULU</span>
+                <span class="star text-2xl">★</span>
+            </div>
+            <ul class="hidden md:flex space-x-8">
+                <li><a href="#" class="nav-link text-gray-700 hover:text-pink-400" data-page="home">Home</a></li>
+                <li><a href="#" class="nav-link text-gray-700 hover:text-pink-400" data-page="raffles">Draws</a></li>
+                <li><a href="#" class="nav-link text-gray-700 hover:text-pink-400" data-page="register">Register</a></li>
+                <li><a href="#" class="nav-link text-gray-700 hover:text-pink-400" data-page="login">Login</a></li>
+                <li><a href="#" class="nav-link text-gray-700 hover:text-pink-400 hidden" id="accountLink" data-page="account">My Account</a></li>
+                <li><a href="#" class="nav-link text-gray-700 hover:text-pink-400 hidden" id="adminLink" data-page="admin">Admin</a></li>
+            </ul>
+            <button class="md:hidden text-gray-700" id="mobileMenuBtn">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden fixed inset-0 bg-white z-40 pt-20">
+        <ul class="flex flex-col items-center space-y-8 p-8">
+            <li><a href="#" class="text-gray-700 text-xl" data-page="home">Home</a></li>
+            <li><a href="#" class="text-gray-700 text-xl" data-page="raffles">Draws</a></li>
+            <li><a href="#" class="text-gray-700 text-xl" data-page="register">Register</a></li>
+            <li><a href="#" class="text-gray-700 text-xl" data-page="login">Login</a></li>
+            <li><a href="#" class="text-gray-700 text-xl hidden" id="mobileAccountLink" data-page="account">My Account</a></li>
+            <li><a href="#" class="text-gray-700 text-xl hidden" id="mobileAdminLink" data-page="admin">Admin</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Homepage -->
+        <section id="home" class="page-section active">
+            <!-- Hero Banner -->
+            <div class="hero-background py-24 md:py-32 px-4 relative">
+                <div class="absolute inset-0 shimmer"></div>
+                <div class="container mx-auto text-center relative z-10">
+                    <div class="floating mb-8">
+                        <img src="https://i.ebayimg.com/images/g/ReMAAeSwuTto-qMx/s-l1600.webp" alt="Labubu Mascot" class="w-40 h-40 md:w-56 md:h-56 mx-auto rounded-full border-6 border-white shadow-2xl">
+                    </div>
+                    <h1 class="rainbow-text text-5xl md:text-7xl lg:text-8xl font-bold mb-6">BUBULU</h1>
+                    <span class="star text-4xl md:text-5xl lg:text-6xl">★</span>
+                    <p class="text-xl md:text-3xl lg:text-4xl text-white mt-6 mb-10 font-semibold drop-shadow-lg">Your Gateway to Authentic Labubu Collectibles</p>
+                    <button class="btn-primary text-lg md:text-xl lg:text-2xl px-10 py-5" id="heroGetFreeTicket">
+                        <i class="fas fa-gift mr-3"></i> Get 1 Free Ticket
+                    </button>
+                    <div class="mt-12 flex justify-center space-x-6">
+                        <img src="https://i.ebayimg.com/images/g/ReMAAeSwuTto-qMx/s-l1600.webp" alt="Labubu" class="w-16 h-16 md:w-20 md:h-20 rounded-full floating shadow-lg" style="animation-delay: 0.2s;">
+                        <img src="https://tinyurl.com/56hf7tdr" alt="Labubu" class="w-16 h-16 md:w-20 md:h-20 rounded-full floating shadow-lg" style="animation-delay: 0.4s;">
+                        <img src="https://u-mercari-images.mercdn.net/photos/m99764209543_1.jpg" alt="Labubu" class="w-16 h-16 md:w-20 md:h-20 rounded-full floating shadow-lg" style="animation-delay: 0.6s;">
+                        <img src="https://tinyurl.com/22muzj7y" alt="Labubu" class="w-16 h-16 md:w-20 md:h-20 rounded-full floating shadow-lg" style="animation-delay: 0.8s;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketing Points -->
+            <div class="container mx-auto px-4 py-16 md:py-20">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                    <div class="text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-coins text-3xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-3">Entries from just 20p</h3>
+                        <p class="text-gray-600 text-lg">Affordable chances to win your favorite Labubu figures</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-trophy text-3xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-3">Winners every single day</h3>
+                        <p class="text-gray-600 text-lg">Daily draws mean more opportunities to win</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-certificate text-3xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-3">100% authentic Labubu</h3>
+                        <p class="text-gray-600 text-lg">Genuine collectibles sourced independently</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Super Draw -->
+                <div class="daily-super-draw pastel-card p-8 md:p-12 relative">
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold rainbow-text mb-4">Daily Super Draw</h2>
+                        <div class="flex justify-center items-center space-x-2">
+                            <span class="star text-2xl">★</span>
+                            <span class="text-lg md:text-xl text-purple-600 font-semibold">TODAY'S FEATURED PRIZE</span>
+                            <span class="star text-2xl">★</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                        <div class="prize-image-container">
+                            <img style="width: 100%; height: 400px;" src="https://tinyurl.com/3sae7xxz" alt="Today's Prize" class="prize-image labubu-image w-full max-w-md mx-auto rounded-3xl">
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-bold badge-glow">
+                                <i class="fas fa-crown mr-2"></i> LIMITED EDITION
+                            </div>
+                            <div class="absolute bottom-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full text-sm font-bold badge-glow">
+                                <i class="fas fa-fire mr-2"></i> ONLY 100 WORLDWIDE
+                            </div>
+                        </div>
+
+
+                        
+                        <div class="text-center lg:text-left space-y-6">
+                            <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800">The monsters labubu</h3>
+                            <p class="text-gray-600 text-lg leading-relaxed">
+                                A rare limited edition from the Enchanted Series. This mystical figure features intricate details and comes with a special certificate of authenticity. Don't miss your chance to own this collector's dream!
+                            </p>
+                            
+                            <div class="countdown-display inline-block">
+                                <p class="text-lg font-semibold text-gray-700 mb-2">Draw closes in:</p>
+                                <div class="countdown text-3xl md:text-4xl text-purple-600 font-bold" id="dailyCountdown">23:45:12</div>
+                            </div>
+                            
+                            <div class="pt-4">
+                                <button class="btn-primary text-lg md:text-xl px-8 py-4" onclick="enterRaffle('#')">
+                                    <i class="fas fa-ticket-alt mr-2"></i> Enter Draw
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center justify-center lg:justify-start space-x-4 pt-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-users text-purple-600 mr-2"></i>
+                                    <span class="text-gray-600">2,847 tickets</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-percentage text-green-600 mr-2"></i>
+                                    <span class="text-gray-600">20p per ticket</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Raffles Grid -->
+            <div class="container mx-auto px-4 py-12 md:py-16">
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12 rainbow-text">Current Draws</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8" id="rafflesGrid">
+                    <!-- Raffle cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Page -->
+        <section id="register" class="page-section">
+            <div class="hero-background py-16 md:py-20">
+                <div class="container mx-auto px-4">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="text-center mb-10">
+                            <img src="https://picsum.photos/seed/labubu-register/150/150.jpg" alt="Register" class="w-28 h-28 mx-auto rounded-full mb-6 shadow-xl">
+                            <h2 class="text-3xl md:text-4xl font-bold rainbow-text mb-4">Create Your Account</h2>
+                            <p class="text-white text-lg">Join the BUBULU community and get your free ticket!</p>
+                        </div>
+                        <div class="pastel-card p-8 md:p-10">
+                            <form id="registrationForm">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">First Name</label>
+                                        <input type="text" class="form-input" id="firstName" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Last Name</label>
+                                        <input type="text" class="form-input" id="lastName" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-700 font-semibold mb-2">Address 1</label>
+                                        <input type="text" class="form-input" id="address1" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-700 font-semibold mb-2">Address 2 (Optional)</label>
+                                        <input type="text" class="form-input" id="address2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Town/City</label>
+                                        <input type="text" class="form-input" id="town" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Postcode</label>
+                                        <input type="text" class="form-input" id="postcode" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                                        <input type="email" class="form-input" id="email" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-semibold mb-2">Mobile Number</label>
+                                        <input type="tel" class="form-input" id="mobile" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-700 font-semibold mb-2">Date of Birth</label>
+                                        <input type="date" class="form-input" id="dob" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-700 font-semibold mb-2">Password</label>
+                                        <input type="password" class="form-input" id="password" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <div class="flex items-start">
+                                            <input type="checkbox" id="terms" class="mt-1 mr-3" required>
+                                            <label for="terms" class="text-gray-700">
+                                                I accept the <a href="#" class="text-purple-600 hover:underline">Terms and Conditions</a> and <a href="#" class="text-purple-600 hover:underline">Privacy Policy</a>. I confirm I am 18 years of age or older.
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-10 text-center">
+                                    <button type="submit" class="btn-primary text-lg">
+                                        <i class="fas fa-user-plus mr-2"></i> Create Account
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Page -->
+        <section id="login" class="page-section">
+            <div class="hero-background py-16 md:py-20">
+                <div class="container mx-auto px-4">
+                    <div class="max-w-md mx-auto">
+                        <div class="text-center mb-10">
+                            <img src="https://picsum.photos/seed/labubu-login/150/150.jpg" alt="Login" class="w-28 h-28 mx-auto rounded-full mb-6 shadow-xl">
+                            <h2 class="text-3xl md:text-4xl font-bold rainbow-text mb-4">Welcome Back</h2>
+                            <p class="text-white text-lg">Login to your BUBULU account</p>
+                        </div>
+                        <div class="pastel-card p-8 md:p-10">
+                            <form id="loginForm">
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                                    <input type="email" class="form-input" id="loginEmail" required>
+                                </div>
+                                <div class="mb-8">
+                                    <label class="block text-gray-700 font-semibold mb-2">Password</label>
+                                    <input type="password" class="form-input" id="loginPassword" required>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn-primary text-lg">
+                                        <i class="fas fa-sign-in-alt mr-2"></i> Login
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Account Page -->
+        <section id="account" class="page-section">
+            <div class="container mx-auto px-4 py-12 md:py-16">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-10">
+                        <img src="https://picsum.photos/seed/labubu-account/150/150.jpg" alt="Account" class="w-28 h-28 mx-auto rounded-full mb-6 shadow-xl">
+                        <h2 class="text-3xl md:text-4xl font-bold rainbow-text">My Account</h2>
+                    </div>
+                    <div class="pastel-card p-8 md:p-10">
+                        <div class="mb-10">
+                            <h3 class="text-xl md:text-2xl font-semibold mb-6">
+                                <i class="fas fa-ticket-alt mr-3 text-purple-600"></i> Your Voucher Code
+                            </h3>
+                            <div class="bg-white rounded-xl p-6 flex items-center justify-between border-2 border-purple-200 shadow-lg">
+                                <span class="text-2xl md:text-3xl font-mono font-bold" id="userVoucherCode">ABCD1234EFGH</span>
+                                <button class="btn-primary" id="copyVoucherBtn">
+                                    <i class="fas fa-copy mr-2"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-semibold mb-6">
+                                <i class="fas fa-user mr-3 text-purple-600"></i> Account Details
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="text-gray-600 mb-2">Name:</p>
+                                    <p class="font-semibold text-lg" id="userName">John Doe</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600 mb-2">Email:</p>
+                                    <p class="font-semibold text-lg" id="userEmail">john@example.com</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600 mb-2">Address:</p>
+                                    <p class="font-semibold text-lg" id="userAddress">123 Main St, London, SW1A 1AA</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600 mb-2">Member Since:</p>
+                                    <p class="font-semibold text-lg" id="userJoinDate">January 1, 2023</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-10 text-center">
+                            <button class="btn-primary text-lg" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Raffles Page -->
+        <section id="raffles" class="page-section">
+            <div class="container mx-auto px-4 py-12 md:py-16">
+                <div class="text-center mb-10">
+                    <img src="https://picsum.photos/seed/labubu-draws/150/150.jpg" alt="Draws" class="w-28 h-28 mx-auto rounded-full mb-6 shadow-xl">
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold rainbow-text">All Draws</h2>
+                    <p class="text-gray-600 text-lg mt-4">Browse all available Labubu raffles</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="allRafflesGrid">
+
+                    <!-- All raffle cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard -->
+        <section id="admin" class="page-section">
+            <div class="container mx-auto px-4 py-12 md:py-16">
+                <div class="text-center mb-10">
+                    <img src="https://picsum.photos/seed/labubu-admin/150/150.jpg" alt="Admin" class="w-28 h-28 mx-auto rounded-full mb-6 shadow-xl">
+                    <h2 class="text-3xl md:text-4xl font-bold rainbow-text">Admin Dashboard</h2>
+                </div>
+                <div class="pastel-card p-8 md:p-10">
+                    <div class="mb-10">
+                        <h3 class="text-xl md:text-2xl font-semibold mb-6">
+                            <i class="fas fa-plus-circle mr-3 text-purple-600"></i> Create New Raffle
+                        </h3>
+                        <form id="createRaffleForm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Title</label>
+                                    <input type="text" class="form-input" id="raffleTitle" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Price per ticket (£)</label>
+                                    <input type="number" step="0.01" min="0." class="form-input" id="rafflePrice" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 font-semibold mb-2">Description</label>
+                                    <textarea class="form-input" id="raffleDescription" rows="3" required></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">External Link</label>
+                                    <input type="url" class="form-input" id="raffleLink" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Image URL</label>
+                                    <input type="url" class="form-input" id="raffleImage" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Start Date & Time (UK)</label>
+                                    <input type="datetime-local" class="form-input" id="raffleStart" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">End Date & Time (UK)</label>
+                                    <input type="datetime-local" class="form-input" id="raffleEnd" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <div class="flex items-center space-x-6">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="raffleFeatured" class="mr-2">
+                                            <span>Featured</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="raffleDaily" class="mr-2">
+                                            <span>Daily Super Draw</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-8 text-center">
+                                <button type="submit" class="btn-primary text-lg">
+                                    <i class="fas fa-plus mr-2"></i> Create Raffle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-6">
+                            <i class="fas fa-users mr-3 text-purple-600"></i> Registered Users
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full bg-white rounded-xl overflow-hidden shadow-lg">
+                                <thead class="bg-gradient-to-r from-pink-200 to-purple-200">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left">Name</th>
+                                        <th class="px-6 py-4 text-left">Email</th>
+                                        <th class="px-6 py-4 text-left">Voucher Code</th>
+                                        <th class="px-6 py-4 text-left">Join Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable">
+                                    <!-- User rows will be inserted here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-pink-100 to-purple-100 py-8 px-4">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <span class="rainbow-text text-2xl font-bold">BUBULU</span>
+                        <span class="star text-xl">★</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2">© 2025 BUBULU. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-6 mb-4 md:mb-0">
+                    <a href="#" class="text-gray-600 hover:text-purple-600">
+                        <i class="fas fa-file-alt mr-1"></i> Terms
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-purple-600">
+                        <i class="fas fa-shield-alt mr-1"></i> Privacy Policy
+                    </a>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-pink-400">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-pink-400">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-pink-400">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200 text-center">
+                <p class="text-xs text-gray-500">Bubulu is owned and operated by Star Online Media Limited, an independent reseller of genuine Labubu products. Bubulu is not affiliated with or endorsed by Pop Mart or its brands.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="bg-white rounded-2xl p-8 max-w-md mx-auto">
+            <div class="text-center">
+                <img src="https://picsum.photos/seed/success-celebration/120/120.jpg" alt="Success" class="w-24 h-24 mx-auto mb-6 rounded-full shadow-xl">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                    <i class="fas fa-check text-3xl text-green-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Registration Successful!</h3>
+                <p class="mb-6 text-lg">Your voucher code is:</p>
+                <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-6 mb-6 border-2 border-purple-300">
+                    <span class="text-2xl font-mono font-bold" id="modalVoucherCode">ABCD1234EFGH</span>
+                </div>
+                <button class="btn-primary" id="modalCloseBtn">
+                    <i class="fas fa-thumbs-up mr-2"></i> Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+            <span id="toastMessage">Success!</span>
+        </div>
+    </div>
+
+    <script>
+        // Simple MD5 implementation
+        function md5(string) {
+            function RotateLeft(lValue, iShiftBits) {
+                return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
+            }
+            function AddUnsigned(lX,lY) {
+                var lX4,lY4,lX8,lY8,lResult;
+                lX8 = (lX & 0x80000000);
+                lY8 = (lY & 0x80000000);
+                lX4 = (lX & 0x40000000);
+                lY4 = (lY & 0x40000000);
+                lResult = (lX & 0x3FFFFFFF)+(lY & 0x3FFFFFFF);
+                if (lX4 & lY4) {
+                    return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
+                }
+                if (lX4 | lY4) {
+                    if (lResult & 0x40000000) {
+                        return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
+                    } else {
+                        return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
+                    }
+                } else {
+                    return (lResult ^ lX8 ^ lY8);
+                }
+            }
+            function F(x,y,z) { return (x & y) | ((~x) & z); }
+            function G(x,y,z) { return (x & z) | (y & (~z)); }
+            function H(x,y,z) { return (x ^ y ^ z); }
+            function I(x,y,z) { return (y ^ (x | (~z))); }
+            function FF(a,b,c,d,x,s,ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            };
+            function GG(a,b,c,d,x,s,ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            };
+            function HH(a,b,c,d,x,s,ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            };
+            function II(a,b,c,d,x,s,ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            };
+            function ConvertToWordArray(string) {
+                var lWordCount;
+                var lMessageLength = string.length;
+                var lNumberOfWords_temp1=lMessageLength + 8;
+                var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1 % 64))/64;
+                var lNumberOfWords = (lNumberOfWords_temp2+1)*16;
+                var lWordArray=Array(lNumberOfWords-1);
+                var lBytePosition = 0;
+                var lByteCount = 0;
+                while ( lByteCount < lMessageLength ) {
+                    lWordCount = (lByteCount-(lByteCount % 4))/4;
+                    lBytePosition = (lByteCount % 4)*8;
+                    lWordArray[lWordCount] = (lWordArray[lWordCount] | (string.charCodeAt(lByteCount)<<lBytePosition));
+                    lByteCount++;
+                }
+                lWordCount = (lByteCount-(lByteCount % 4))/4;
+                lBytePosition = (lByteCount % 4)*8;
+                lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80<<lBytePosition);
+                lWordArray[lNumberOfWords-2] = lMessageLength<<3;
+                lWordArray[lNumberOfWords-1] = lMessageLength>>>29;
+                return lWordArray;
+            };
+            function WordToHex(lValue) {
+                var WordToHexValue="",WordToHexValue_temp="",lByte,lCount;
+                for (lCount = 0;lCount<=3;lCount++) {
+                    lByte = (lValue>>>(lCount*8)) & 255;
+                    WordToHexValue_temp = "0" + lByte.toString(16);
+                    WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length-2,2);
+                }
+                return WordToHexValue;
+            };
+            function Utf8Encode(string) {
+                string = string.replace(/\r\n/g,"\n");
+                var utftext = "";
+                for (var n = 0; n < string.length; n++) {
+                    var c = string.charCodeAt(n);
+                    if (c < 128) {
+                        utftext += String.fromCharCode(c);
+                    }
+                    else if((c > 127) && (c < 2048)) {
+                        utftext += String.fromCharCode((c >> 6) | 192);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    }
+                    else {
+                        utftext += String.fromCharCode((c >> 12) | 224);
+                        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    }
+                }
+                return utftext;
+            };
+            var x=Array();
+            var k,AA,BB,CC,DD,a,b,c,d;
+            var S11=7, S12=12, S13=17, S14=22;
+            var S21=5, S22=9 , S23=14, S24=20;
+            var S31=4, S32=11, S33=16, S34=23;
+            var S41=6, S42=10, S43=15, S44=21;
+            string = Utf8Encode(string);
+            x = ConvertToWordArray(string);
+            a = 0x67452301; b = 0xEFCDAB89; c = 0x98BADCFE; d = 0x10325476;
+            for (k=0;k<x.length;k+=16) {
+                AA=a; BB=b; CC=c; DD=d;
+                a=FF(a,b,c,d,x[k+0], S11,0xD76AA478);
+                d=FF(d,a,b,c,x[k+1], S12,0xE8C7B756);
+                c=FF(c,d,a,b,x[k+2], S13,0x242070DB);
+                b=FF(b,c,d,a,x[k+3], S14,0xC1BDCEEE);
+                a=FF(a,b,c,d,x[k+4], S11,0xF57C0FAF);
+                d=FF(d,a,b,c,x[k+5], S12,0x4787C62A);
+                c=FF(c,d,a,b,x[k+6], S13,0xA8304613);
+                b=FF(b,c,d,a,x[k+7], S14,0xFD469501);
+                a=FF(a,b,c,d,x[k+8], S11,0x698098D8);
+                d=FF(d,a,b,c,x[k+9], S12,0x8B44F7AF);
+                c=FF(c,d,a,b,x[k+10], S13,0xFFFF5BB1);
+                b=FF(b,c,d,a,x[k+11], S14,0x895CD7BE);
+                a=FF(a,b,c,d,x[k+12], S11,0x6B901122);
+                d=FF(d,a,b,c,x[k+13], S12,0xFD987193);
+                c=FF(c,d,a,b,x[k+14], S13,0xA679438E);
+                b=FF(b,c,d,a,x[k+15], S14,0x49B40821);
+                a=GG(a,b,c,d,x[k+1], S21,0xF61E2562);
+                d=GG(d,a,b,c,x[k+6], S22,0xC040B340);
+                c=GG(c,d,a,b,x[k+11], S23,0x265E5A51);
+                b=GG(b,c,d,a,x[k+0], S24,0xE9B6C7AA);
+                a=GG(a,b,c,d,x[k+5], S21,0xD62F105D);
+                d=GG(d,a,b,c,x[k+10], S22,0x2441453);
+                c=GG(c,d,a,b,x[k+15], S23,0xD8A1E681);
+                b=GG(b,c,d,a,x[k+4], S24,0xE7D3FBC8);
+                a=GG(a,b,c,d,x[k+9], S21,0x21E1CDE6);
+                d=GG(d,a,b,c,x[k+14], S22,0xC33707D6);
+                c=GG(c,d,a,b,x[k+3], S23,0xF4D50D87);
+                b=GG(b,c,d,a,x[k+8], S24,0x455A14ED);
+                a=GG(a,b,c,d,x[k+13], S21,0xA9E3E905);
+                d=GG(d,a,b,c,x[k+2], S22,0xFCEFA3F8);
+                c=GG(c,d,a,b,x[k+7], S23,0x676F02D9);
+                b=GG(b,c,d,a,x[k+12], S24,0x8D2A4C8A);
+                a=HH(a,b,c,d,x[k+5], S31,0xFFFA3942);
+                d=HH(d,a,b,c,x[k+8], S32,0x8771F681);
+                c=HH(c,d,a,b,x[k+11], S33,0x6D9D6122);
+                b=HH(b,c,d,a,x[k+14], S34,0xFDE5380C);
+                a=HH(a,b,c,d,x[k+1], S31,0xA4BEEA44);
+                d=HH(d,a,b,c,x[k+4], S32,0x4BDECFA9);
+                c=HH(c,d,a,b,x[k+7], S33,0xF6BB4B60);
+                b=HH(b,c,d,a,x[k+10], S34,0xBEBFBC70);
+                a=HH(a,b,c,d,x[k+13], S31,0x289B7EC6);
+                d=HH(d,a,b,c,x[k+0], S32,0xEAA127FA);
+                c=HH(c,d,a,b,x[k+3], S33,0xD4EF3085);
+                b=HH(b,c,d,a,x[k+6], S34,0x4881D05);
+                a=HH(a,b,c,d,x[k+9], S31,0xD9D4D039);
+                d=HH(d,a,b,c,x[k+12], S32,0xE6DB99E5);
+                c=HH(c,d,a,b,x[k+15], S33,0x1FA27CF8);
+                b=HH(b,c,d,a,x[k+2], S34,0xC4AC5665);
+                a=II(a,b,c,d,x[k+0], S41,0xF4292244);
+                d=II(d,a,b,c,x[k+7], S42,0x432AFF97);
+                c=II(c,d,a,b,x[k+14], S43,0xAB9423A7);
+                b=II(b,c,d,a,x[k+5], S44,0xFC93A039);
+                a=II(a,b,c,d,x[k+12], S41,0x655B59C3);
+                d=II(d,a,b,c,x[k+3], S42,0x8F0CCC92);
+                c=II(c,d,a,b,x[k+10], S43,0xFFEFF47D);
+                b=II(b,c,d,a,x[k+1], S44,0x85845DD1);
+                a=II(a,b,c,d,x[k+8], S41,0x6FA87E4F);
+                d=II(d,a,b,c,x[k+15], S42,0xFE2CE6E0);
+                c=II(c,d,a,b,x[k+6], S43,0xA3014314);
+                b=II(b,c,d,a,x[k+13], S44,0x4E0811A1);
+                a=II(a,b,c,d,x[k+4], S41,0xF7537E82);
+                d=II(d,a,b,c,x[k+11], S42,0xBD3AF235);
+                c=II(c,d,a,b,x[k+2], S43,0x2AD7D2BB);
+                b=II(b,c,d,a,x[k+9], S44,0xEB86D391);
+                a=AddUnsigned(a,AA);
+                b=AddUnsigned(b,BB);
+                c=AddUnsigned(c,CC);
+                d=AddUnsigned(d,DD);
+            }
+            var temp = WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);
+            return temp.toLowerCase();
+        }
+
+        // Generate voucher code from email
+        function generateVoucherCode(email) {
+            const lowerEmail = email.toLowerCase().trim();
+            const hash = md5(lowerEmail);
+            return hash.substring(0, 12).toUpperCase();
+        }
+
+        // Sample raffle data with Labubu-themed images
+        const sampleRaffles = [
+            {
+                id: 1,
+                title: "Rock the Universe Labubu",
+                description: "A rare limited edition from the Enchanted Series - magical and mysterious",
+                price: 1,
+                image: "https://u-mercari-images.mercdn.net/photos/m99764209543_1.jpg",
+                externalLink: "#",
+                featured: true,
+                dailySuperDraw: true,
+                startAt: new Date(),
+                endAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                status: "active"
+            },
+            {
+                id: 2,
+                title: "Cosmic Dream Labubu",
+                description: "From the exclusive Space Collection - reach for the stars!",
+                price: 0.75,
+                image: "https://tinyurl.com/5ffpnrpc",
+                externalLink: "#",
+                featured: true,
+                dailySuperDraw: false,
+                startAt: new Date(),
+                endAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                status: "active"
+            },
+            {
+                id: 3,
+                title: "Big Into Energy Secret Labubu",
+                description: "Part of the delicious Dessert Series - sweet as can be!",
+                price: 1,
+                image: "https://tinyurl.com/56hf7tdr",
+                externalLink: "#",
+                featured: false,
+                dailySuperDraw: false,
+                startAt: new Date(),
+                endAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+                status: "active"
+            },
+            {
+                id: 4,
+                title: "Exciting Macaron 6 Blind Box Set",
+                description: "Dive into adventure with this underwater themed figure",
+                price: 0.75,
+                image: "https://u-mercari-images.mercdn.net/photos/m42059714411_1.jpg",
+                externalLink: "#",
+                featured: false,
+                dailySuperDraw: false,
+                startAt: new Date(),
+                endAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+                status: "active"
+            },
+            {
+                id: 5,
+                title: "Pin for Love A-M Set",
+                description: "Magical and whimsical, perfect for collectors",
+                price:2,
+                image: "https://tinyurl.com/22muzj7y",
+                externalLink: "#",
+                featured: false,
+                dailySuperDraw: false,
+                startAt: new Date(),
+                endAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                status: "active"
+            },
+            {
+                id: 6,
+                title: "Pin for Love N-Z Set",
+                description: "Chilly and charming, a seasonal special",
+                price: 2,
+                image: "https://tinyurl.com/24tkjm2m",
+                externalLink: "#",
+                featured: false,
+                dailySuperDraw: false,
+                startAt: new Date(),
+                endAt: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
+                status: "active"
+            }
+        ];
+
+        // Sample users data
+        const sampleUsers = [
+            {
+                id: 1,
+                firstName: "John",
+                lastName: "Doe",
+                email: "john@example.com",
+                voucherCode: "ABCD1234EFGH",
+                joinDate: "2023-01-15"
+            },
+            {
+                id: 2,
+                firstName: "Jane",
+                lastName: "Smith",
+                email: "jane@example.com",
+                voucherCode: "EFGH5678IJKL",
+                joinDate: "2023-02-20"
+            },
+            {
+                id: 3,
+                firstName: "Alex",
+                lastName: "Johnson",
+                email: "alex@example.com",
+                voucherCode: "IJKL9012MNOP",
+                joinDate: "2023-03-10"
+            }
+        ];
+
+        // Current user state
+        let currentUser = null;
+        let isLoggedIn = false;
+        let isAdmin = false;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRaffles();
+            renderAllRaffles();
+            renderUsers();
+            startCountdowns();
+            setupEventListeners();
+        });
+
+        // Render raffles on homepage
+        function renderRaffles() {
+            const rafflesGrid = document.getElementById('rafflesGrid');
+            const featuredRaffles = sampleRaffles.filter(r => r.featured).slice(0, 3);
+            
+            rafflesGrid.innerHTML = '';
+            featuredRaffles.forEach(raffle => {
+                const raffleCard = createRaffleCard(raffle);
+                rafflesGrid.appendChild(raffleCard);
+            });
+        }
+
+        // Render all raffles on raffles page
+        function renderAllRaffles() {
+            const allRafflesGrid = document.getElementById('allRafflesGrid');
+            
+            allRafflesGrid.innerHTML = '';
+            sampleRaffles.forEach(raffle => {
+                const raffleCard = createRaffleCard(raffle);
+                allRafflesGrid.appendChild(raffleCard);
+            });
+        }
+
+        // Create raffle card element
+        function createRaffleCard(raffle) {
+            const card = document.createElement('div');
+            card.className = 'raffle-card pastel-card p-6';
+            
+            const now = new Date();
+            const endDate = new Date(raffle.endAt);
+            const isExpired = now > endDate;
+            const statusClass = isExpired ? 'bg-gray-500' : 'bg-green-500';
+            const statusText = isExpired ? 'Raffle Closed' : 'Active';
+            
+            card.innerHTML = `
+                <div class="relative">
+                    <img src="${raffle.image}" alt="${raffle.title}" class="labubu-image w-full h-48 object-cover">
+                    <span class="absolute top-3 right-3 px-3 py-1 text-white text-sm font-semibold rounded-full ${statusClass}">${statusText}</span>
+                    ${raffle.dailySuperDraw ? '<span class="absolute top-3 left-3 px-3 py-1 bg-purple-500 text-white text-sm font-semibold rounded-full">Daily Super Draw</span>' : ''}
+                    ${raffle.price >= 0.50 ? '<span class="absolute bottom-3 right-3 px-3 py-1 bg-orange-500 text-white text-sm font-semibold rounded-full">Premium</span>' : ''}
+                </div>
+                <h3 class="text-xl font-bold mb-2">${raffle.title}</h3>
+                <p class="text-gray-600 mb-4">${raffle.description}</p>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold">£${raffle.price.toFixed(2)} per ticket</span>
+                    <div class="countdown text-sm" data-end="${raffle.endAt.toISOString()}">
+                        ${isExpired ? 'Expired' : 'Calculating...'}
+                    </div>
+                </div>
+                <button class="btn-primary w-full ${isExpired ? 'opacity-50 cursor-not-allowed' : ''}" ${isExpired ? 'disabled' : ''} onclick="enterRaffle('${raffle.externalLink}')">
+                    ${isExpired ? 'Raffle Closed' : '<i class="fas fa-ticket-alt mr-2"></i> Enter Draw'}
+                </button>
+            `;
+            
+            return card;
+        }
+
+        // Render users in admin dashboard
+        function renderUsers() {
+            const usersTable = document.getElementById('usersTable');
+            
+            usersTable.innerHTML = '';
+            sampleUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <img src="https://picsum.photos/seed/user-${user.id}/40/40.jpg" alt="${user.firstName}" class="w-10 h-10 rounded-full mr-3">
+                            ${user.firstName} ${user.lastName}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">${user.email}</td>
+                    <td class="px-6 py-4 font-mono text-sm">${user.voucherCode}</td>
+                    <td class="px-6 py-4">${user.joinDate}</td>
+                `;
+                usersTable.appendChild(row);
+            });
+        }
+
+        // Start countdown timers
+        function startCountdowns() {
+            setInterval(() => {
+                const countdownElements = document.querySelectorAll('.countdown[data-end]');
+                
+                countdownElements.forEach(element => {
+                    const endTime = new Date(element.getAttribute('data-end'));
+                    const now = new Date();
+                    const diff = endTime - now;
+                    
+                    if (diff <= 0) {
+                        element.textContent = 'Expired';
+                        return;
+                    }
+                    
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    element.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                });
+                
+                // Update daily countdown
+                const dailyCountdown = document.getElementById('dailyCountdown');
+                if (dailyCountdown) {
+                    const dailyRaffle = sampleRaffles.find(r => r.dailySuperDraw);
+                    if (dailyRaffle) {
+                        const endTime = new Date(dailyRaffle.endAt);
+                        const now = new Date();
+                        const diff = endTime - now;
+                        
+                        if (diff <= 0) {
+                            dailyCountdown.textContent = 'Expired';
+                            return;
+                        }
+                        
+                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                        
+                        dailyCountdown.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+            }, 1000);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                    
+                    // Close mobile menu if open
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                });
+            });
+            
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                document.getElementById('mobileMenu').classList.toggle('hidden');
+            });
+            
+            // Hero CTA button
+            document.getElementById('heroGetFreeTicket').addEventListener('click', function() {
+                showPage('register');
+            });
+            
+            // Registration form
+            document.getElementById('registrationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const formData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    address1: document.getElementById('address1').value,
+                    address2: document.getElementById('address2').value,
+                    town: document.getElementById('town').value,
+                    postcode: document.getElementById('postcode').value,
+                    email: document.getElementById('email').value,
+                    mobile: document.getElementById('mobile').value,
+                    dob: document.getElementById('dob').value,
+                    password: document.getElementById('password').value,
+                    terms: document.getElementById('terms').checked
+                };
+                
+                // Validate age (18+)
+                const dobDate = new Date(formData.dob);
+                const today = new Date();
+                const age = Math.floor((today - dobDate) / (365.25 * 24 * 60 * 60 * 1000));
+                
+                if (age < 18) {
+                    showToast('You must be 18 or older to register', 'error');
+                    return;
+                }
+                
+                // Generate voucher code
+                const voucherCode = generateVoucherCode(formData.email);
+                
+                // Create user object
+                const newUser = {
+                    id: sampleUsers.length + 1,
+                    ...formData,
+                    voucherCode: voucherCode,
+                    joinDate: new Date().toISOString().split('T')[0]
+                };
+                
+                // Add to users array
+                sampleUsers.push(newUser);
+                
+                // Set current user
+                currentUser = newUser;
+                isLoggedIn = true;
+                
+                // Update UI
+                updateAuthUI();
+                
+                // Show success modal
+                document.getElementById('modalVoucherCode').textContent = voucherCode;
+                document.getElementById('successModal').classList.add('active');
+                
+                // Reset form
+                this.reset();
+            });
+            
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                // Find user by email (in a real app, we'd verify password)
+                const user = sampleUsers.find(u => u.email === email);
+                
+                if (user) {
+                    currentUser = user;
+                    isLoggedIn = true;
+                    
+                    // Check if admin (simple check for demo)
+                    if (email === 'admin@bubulu.com') {
+                        isAdmin = true;
+                    }
+                    
+                    updateAuthUI();
+                    showToast('Login successful!');
+                    
+                    // Redirect to account or admin page
+                    showPage(isAdmin ? 'admin' : 'account');
+                } else {
+                    showToast('Invalid email or password', 'error');
+                }
+                
+                // Reset form
+                this.reset();
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                currentUser = null;
+                isLoggedIn = false;
+                isAdmin = false;
+                
+                updateAuthUI();
+                showToast('You have been logged out');
+                showPage('home');
+            });
+            
+            // Copy voucher button
+            document.getElementById('copyVoucherBtn').addEventListener('click', function() {
+                const voucherCode = document.getElementById('userVoucherCode').textContent;
+                navigator.clipboard.writeText(voucherCode).then(() => {
+                    showToast('Voucher code copied to clipboard!');
+                });
+            });
+            
+            // Modal close button
+            document.getElementById('modalCloseBtn').addEventListener('click', function() {
+                document.getElementById('successModal').classList.remove('active');
+                showPage('account');
+            });
+            
+            // Create raffle form
+            document.getElementById('createRaffleForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const newRaffle = {
+                    id: sampleRaffles.length + 1,
+                    title: document.getElementById('raffleTitle').value,
+                    description: document.getElementById('raffleDescription').value,
+                    price: parseFloat(document.getElementById('rafflePrice').value),
+                    image: document.getElementById('raffleImage').value,
+                    externalLink: document.getElementById('raffleLink').value,
+                    featured: document.getElementById('raffleFeatured').checked,
+                    dailySuperDraw: document.getElementById('raffleDaily').checked,
+                    startAt: new Date(document.getElementById('raffleStart').value),
+                    endAt: new Date(document.getElementById('raffleEnd').value),
+                    status: "active"
+                };
+                
+                // Add to raffles array
+                sampleRaffles.push(newRaffle);
+                
+                // Update UI
+                renderRaffles();
+                renderAllRaffles();
+                
+                // Reset form
+                this.reset();
+                
+                showToast('Raffle created successfully!');
+            });
+        }
+
+        // Show page
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update account page if user is logged in
+            if (pageId === 'account' && currentUser) {
+                document.getElementById('userName').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('userAddress').textContent = `${currentUser.address1}, ${currentUser.town}, ${currentUser.postcode}`;
+                document.getElementById('userJoinDate').textContent = currentUser.joinDate;
+                document.getElementById('userVoucherCode').textContent = currentUser.voucherCode;
+            }
+        }
+
+        // Update auth UI
+        function updateAuthUI() {
+            const accountLink = document.getElementById('accountLink');
+            const mobileAccountLink = document.getElementById('mobileAccountLink');
+            const adminLink = document.getElementById('adminLink');
+            const mobileAdminLink = document.getElementById('mobileAdminLink');
+            
+            if (isLoggedIn) {
+                accountLink.classList.remove('hidden');
+                mobileAccountLink.classList.remove('hidden');
+                
+                if (isAdmin) {
+                    adminLink.classList.remove('hidden');
+                    mobileAdminLink.classList.remove('hidden');
+                }
+            } else {
+                accountLink.classList.add('hidden');
+                mobileAccountLink.classList.add('hidden');
+                adminLink.classList.add('hidden');
+                mobileAdminLink.classList.add('hidden');
+            }
+        }
+
+        // Enter raffle
+        function enterRaffle(link) {
+            if (!isLoggedIn) {
+                showToast('Please register or login to enter this draw', 'error');
+                showPage('register');
+                return;
+            }
+            
+            // In a real app, this would open the external raffle link
+            window.open(link, '_blank');
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const icon = toast.querySelector('i');
+            
+            // Update message and icon
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle text-red-500 mr-3';
+            } else {
+                icon.className = 'fas fa-check-circle text-green-500 mr-3';
+            }
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
